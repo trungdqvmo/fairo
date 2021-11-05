@@ -137,7 +137,7 @@ class DroidletAgent(BaseAgent):
                     chat=command, parsing_model=self.perception_modules["language_understanding"].parsing_model
                 )
                 logical_form = self.dialogue_manager.dialogue_object_mapper.postprocess_logical_form(
-                    speaker="dashboard", chat=command, logical_form=chat_parse
+                    speaker="dashboard", chat=command, logical_form=chat_parse, object_data=object_data
                 )
                 logging.info("logical form is : %r" % (logical_form))
                 status = "Sent successfully"
