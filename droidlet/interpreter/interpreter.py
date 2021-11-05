@@ -181,7 +181,7 @@ class Interpreter(DialogueObject):
             logging.info("got mems ref: ")
             logging.info(mems)
             if len(mems) > 1:
-                return None, "There are multiple objects satified this condition. What do you want to refer? {}".format(", ".join([mem.eid for mem in mems])), None
+                return None, "There are multiple objects satified this condition. What do you want to refer? {}".format(", ".join([str(mem.eid) for mem in mems])), None
             # FIXME this should go in the ref_location subinterpret:
             steps, reldir = interpret_relative_direction(self, location_d)
             pos, _ = self.subinterpret["specify_locations"](self, speaker, mems, steps, reldir)
