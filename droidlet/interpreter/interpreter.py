@@ -110,7 +110,7 @@ class Interpreter(DialogueObject):
                     response, dialogue_data = r
                 if task:
                     tasks_to_push.append(task)
-                logging.debug(f"action {action_def} record this task {task}")
+                logging.info(f"action {action_def} record this task {task}")
             task_mem = None
             if tasks_to_push:
                 T = maybe_task_list_to_control_block(tasks_to_push, agent)
