@@ -115,7 +115,7 @@ class DroidletAgent(BaseAgent):
             saveObjectAnnotationsToDb(self.conn, postData)
 
         @sio.on("sendCommandToAgent")
-        def send_text_command_to_agent(sid, command):
+        def send_text_command_to_agent(sid, command, data={}):
             """Add the command to agent's incoming chats list and
             send back the parse.
             Args:
@@ -123,7 +123,7 @@ class DroidletAgent(BaseAgent):
             Returns:
                 return back a socket emit with parse of command and success status
             """
-            logging.debug("in send_text_command_to_agent, got the command: %r" % (command))
+            logging.info("in send_text_command_to_agent, got the command: %r" % (command))
 
             agent_chat = (
                 "<dashboard> " + command
@@ -138,10 +138,10 @@ class DroidletAgent(BaseAgent):
                 logical_form = self.dialogue_manager.dialogue_object_mapper.postprocess_logical_form(
                     speaker="dashboard", chat=command, logical_form=chat_parse
                 )
-                logging.debug("logical form is : %r" % (logical_form))
+                logging.info("logical form is : %r" % (logical_form))
                 status = "Sent successfully"
             except Exception as e:
-                logging.error("error in sending chat", e)
+                logging.info("error in sending chat", e)
                 status = "Error in sending chat"
             # update server memory
             self.dashboard_memory["chatResponse"][command] = logical_form

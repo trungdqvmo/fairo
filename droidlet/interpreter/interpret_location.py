@@ -81,7 +81,7 @@ class ReferenceLocationInterpreter:
             raise ErrorWithResponse("I don't know what you're referring to")
 
         # FIXME:
-        mems = mems[:expected_num]
+        #mems = mems[:expected_num]
         interpreter.memory.update_recent_entities(mems)
 
         return mems

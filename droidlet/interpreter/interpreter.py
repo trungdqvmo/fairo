@@ -83,6 +83,7 @@ class Interpreter(DialogueObject):
         self.task_objects = {}  # noqa
 
     def step(self, agent) -> Tuple[Optional[str], Any]:
+        logging.info("Start Interpreter small step")
         start_time = datetime.datetime.now()
         assert self.action_dict["dialogue_type"] == "HUMAN_GIVE_COMMAND"
         try:
@@ -109,6 +110,7 @@ class Interpreter(DialogueObject):
                     response, dialogue_data = r
                 if task:
                     tasks_to_push.append(task)
+                logging.debug(f"action {action_def} record this task {task}")
             task_mem = None
             if tasks_to_push:
                 T = maybe_task_list_to_control_block(tasks_to_push, agent)
@@ -162,17 +164,24 @@ class Interpreter(DialogueObject):
     def handle_move(self, agent, speaker, d) -> Tuple[Optional[str], Any]:
         Move = self.task_objects["move"]
         Control = self.task_objects["control"]
-
+        logging.info("Control where to move")
         def new_tasks():
             # TODO if we do this better will be able to handle "stay between the x"
+            # for now this code will shut down the "between"
             default_loc = getattr(self, "default_loc", SPEAKERLOOK)
             location_d = d.get("location", default_loc)
             # FIXME! this loop_data trick can now be done more properly with
             # a fixed mem filter
+            logging.info("current loop_data")
+            logging.info(self.loop_data)
             if self.loop_data and hasattr(self.loop_data, "get_pos"):
                 mems = [self.loop_data]
             else:
                 mems = self.subinterpret["reference_locations"](self, speaker, location_d)
+            logging.info("got mems ref: ")
+            logging.info(mems)
+            if len(mems) > 1:
+                return None, "There are multiple objects satified this condition. What do you want to refer? {}".format(", ".join([mem.eid for mem in mems])), None
             # FIXME this should go in the ref_location subinterpret:
             steps, reldir = interpret_relative_direction(self, location_d)
             pos, _ = self.subinterpret["specify_locations"](self, speaker, mems, steps, reldir)

@@ -155,6 +155,8 @@ def interpret_reference_object(
         filters_no_select.pop("selector", None)
         #        filters_no_select.pop("location", None)
         candidate_mems = apply_memory_filters(interpreter, speaker, filters_no_select)
+        logging.info("got candidate mems:")
+        logging.info(candidate_mems)
         if len(candidate_mems) > 0:
             return filter_by_sublocation(
                 interpreter,
@@ -194,7 +196,7 @@ def interpret_reference_object(
 
 def apply_memory_filters(interpreter, speaker, filters_d) -> List[ReferenceObjectNode]:
     """Return a list of (xyz, memory) tuples encompassing all possible reference objects"""
-    F = interpreter.subinterpret["filters"](interpreter, speaker, filters_d)
+    F = interpreter.subinterpret["filters"](interpreter, speaker, filters_d, get_all=True)
     memids, _ = F()
     mems = [interpreter.memory.get_mem_by_id(i) for i in memids]
     return mems
@@ -263,15 +265,19 @@ def filter_by_sublocation(
                 interpreter.memory, {"frame": eid, "relative_direction": reldir}, mem=self_mem
             )
             c_proj = L(candidates)
-            m_proj = L(mems)
+            m_projs = L(mems)
             # FIXME don't just take the first...
-            m_proj = m_proj[0]
+            #m_proj = m_proj[0]
 
             # filter by relative dir, e.g. "left of Y"
-            location_filtered_candidates = [c for (p, c) in zip(c_proj, candidates) if p > m_proj]
-            # "the X left of Y" = the right-most X that is left of Y
+            location_filtered_candidates = []
+            for m_proj in m_projs:
+                location_filtered_candidates.extend([c for (p, c) in zip(c_proj, candidates) if p > m_proj])
+                # "the X left of Y" = the right-most X that is left of Y
             location_filtered_candidates.sort(key=lambda p: p.get_pos())
             distance_sorted = True
+            logging.info("after filter ref object:")
+            logging.info(location_filtered_candidates)
     else:
         # no reference direction: sort by closest
         mems = interpreter.subinterpret["reference_locations"](interpreter, speaker, location)
@@ -291,6 +297,9 @@ def filter_by_sublocation(
         # default_selector_d = {"location": {"location_type": "SPEAKER_LOOK"}}
         selector_d = filters_d.get("selector", default_selector_d)
         S = interpret_selector(interpreter, speaker, selector_d)
+        logging.info("selecting interpret:")
+        # seem like None
+        logging.info(S)
         if S:
             memids, _ = S(
                 [c.memid for c in location_filtered_candidates],
