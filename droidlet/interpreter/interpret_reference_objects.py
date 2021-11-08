@@ -155,7 +155,7 @@ def interpret_reference_object(
         filters_no_select = deepcopy(filters_d)
         filters_no_select.pop("selector", None)
         #        filters_no_select.pop("location", None)
-        candidate_mems = apply_memory_filters(interpreter, speaker, filters_no_select)
+        candidate_mems = apply_memory_filters(interpreter, speaker, filters_no_select, object_data=object_data)
         logging.info("got candidate mems:")
         logging.info(candidate_mems)
         if len(candidate_mems) > 0:
@@ -171,8 +171,9 @@ def interpret_reference_object(
         elif allow_clarification:
             # no candidates found; ask Clarification
             # TODO: move ttad call to dialogue manager and remove this logic
+            logging.info("set logic to allow_clarification")
             interpreter.action_dict_frozen = True
-            confirm_candidates = apply_memory_filters(interpreter, speaker, filters_d)
+            confirm_candidates = apply_memory_filters(interpreter, speaker, filters_d, object_data=object_data)
             objects = object_looked_at(interpreter.memory, confirm_candidates, speaker=speaker)
             if len(objects) == 0:
                 raise ErrorWithResponse("I don't know what you're referring to")
@@ -195,11 +196,14 @@ def interpret_reference_object(
             raise ErrorWithResponse("I don't know what you're referring to")
 
 
-def apply_memory_filters(interpreter, speaker, filters_d) -> List[ReferenceObjectNode]:
+def apply_memory_filters(interpreter, speaker, filters_d, object_data={}) -> List[ReferenceObjectNode]:
     """Return a list of (xyz, memory) tuples encompassing all possible reference objects"""
-    F = interpreter.subinterpret["filters"](interpreter, speaker, filters_d, get_all=True)
+    F = interpreter.subinterpret["filters"](interpreter, speaker, filters_d, object_data=object_data, get_all=True)
     memids, _ = F()
-    mems = [interpreter.memory.get_mem_by_id(i) for i in memids]
+    # TODO: replace this with real database filter
+    mems = [interpreter.memory.get_mem_by_id(i) for i in memids if 'eid' not in object_data or i == object_data['eid']]]
+    if len(mems) > 1:
+        mems = [mems[0]]
     return mems
 
 
