@@ -2,6 +2,7 @@
 Copyright (c) Facebook, Inc. and its affiliates.
 """
 
+import logging
 import math
 from droidlet.shared_data_structs import ErrorWithResponse
 from .interpreter_utils import SPEAKERLOOK, backoff_where
@@ -61,6 +62,7 @@ class ReferenceLocationInterpreter:
 
         default_loc = getattr(interpreter, "default_loc", SPEAKERLOOK)
         ref_obj = d.get("reference_object", default_loc["reference_object"])
+        logging.info("start ref object for {}".format(ref_obj))
         mems = interpreter.subinterpret["reference_objects"](
             interpreter, speaker, ref_obj, loose_speakerlook=loose_speakerlook
         )

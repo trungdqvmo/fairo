@@ -1,6 +1,7 @@
 """
 Copyright (c) Facebook, Inc. and its affiliates.
 """
+import logging
 from copy import deepcopy
 from .interpret_attributes import AttributeInterpreter, maybe_specific_mem
 from droidlet.memory.memory_attributes import LinearExtentAttribute
@@ -35,6 +36,7 @@ CARDINAL_RADIUS = 20
 
 
 def get_val_map(interpreter, speaker, filters_d, get_all=False):
+    logging.
     output = filters_d.get("output")
     val_map = None
     if output and type(output) is dict:
