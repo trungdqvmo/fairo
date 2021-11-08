@@ -201,7 +201,7 @@ def apply_memory_filters(interpreter, speaker, filters_d, object_data={}) -> Lis
     F = interpreter.subinterpret["filters"](interpreter, speaker, filters_d, object_data=object_data, get_all=True)
     memids, _ = F()
     # TODO: replace this with real database filter
-    mems = [interpreter.memory.get_mem_by_id(i) for i in memids if 'eid' not in object_data or i == object_data['eid']]]
+    mems = [interpreter.memory.get_mem_by_id(i) for i in memids if 'eid' not in object_data or i == object_data['eid']]
     if len(mems) > 1:
         mems = [mems[0]]
     return mems

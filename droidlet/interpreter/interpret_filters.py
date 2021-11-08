@@ -36,7 +36,8 @@ CARDINAL_RADIUS = 20
 
 
 def get_val_map(interpreter, speaker, filters_d, get_all=False):
-    logging.
+    logging.info("get_val_map")
+    logging.info(filters_d)
     output = filters_d.get("output")
     val_map = None
     if output and type(output) is dict:
