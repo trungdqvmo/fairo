@@ -30,10 +30,10 @@ from droidlet.perception.robot import Perception
 from droidlet.perception.semantic_parsing.utils.interaction_logger import InteractionLogger
 from self_perception import SelfPerception
 from droidlet.interpreter.robot import (
-    dance, 
+    dance,
     default_behaviors,
-    LocoGetMemoryHandler, 
-    PutMemoryHandler, 
+    LocoGetMemoryHandler,
+    PutMemoryHandler,
     LocoInterpreter,
 )
 from droidlet.dialog.robot import LocoBotCapabilities
@@ -84,17 +84,17 @@ class LocobotAgent(DroidletAgent):
         # list of (prob, default function) pairs
         self.visible_defaults = [(1.0, default_behaviors.explore)]
         self.interaction_logger = InteractionLogger()
-        if os.path.exists("annotation_data/rgb"): 
+        if os.path.exists("annotation_data/rgb"):
             shutil.rmtree("annotation_data/rgb")
-        if os.path.exists("annotation_data/seg"): 
+        if os.path.exists("annotation_data/seg"):
             shutil.rmtree("annotation_data/seg")
-        
+
     def init_event_handlers(self):
         super().init_event_handlers()
 
         @sio.on("movement command")
         def test_command(sid, commands, movement_values={}):
-            if len(movement_values) == 0: 
+            if len(movement_values) == 0:
                 movement_values["yaw"] = 0.01
                 movement_values["velocity"] = 0.1
 
@@ -133,56 +133,56 @@ class LocobotAgent(DroidletAgent):
                 del o["feature_repr"] # pickling optimization
             self.dashboard_memory["objects"] = objects
             sio.emit("updateState", {"memory": self.dashboard_memory})
-        
+
         @sio.on("interaction data")
         def log_interaction_data(sid, interactionData):
             self.interaction_logger.logInteraction(interactionData)
 
         # Returns an array of objects with updated masks
         @sio.on("label_propagation")
-        def label_propagation(sid, postData):        
+        def label_propagation(sid, postData):
             objects = LP.label_propagation(postData)
             sio.emit("labelPropagationReturn", objects)
-        
+
         @sio.on("save_rgb_seg")
-        def save_rgb_seg(sid, postData): 
+        def save_rgb_seg(sid, postData):
             LP.save_rgb_seg(postData)
-            if "callback" in postData and postData["callback"]: 
+            if "callback" in postData and postData["callback"]:
                 sio.emit("saveRgbSegCallback")
 
         @sio.on("save_annotations")
-        def save_annotations(sid, categories): 
+        def save_annotations(sid, categories):
             LP.save_annotations(categories)
 
 
         @sio.on("save_categories_properties")
-        def save_categories_properties(sid, categories, properties): 
+        def save_categories_properties(sid, categories, properties):
             LP.save_categories_properties(categories, properties)
 
         @sio.on("retrain_detector")
-        def retrain_detector(sid, settings={}): 
+        def retrain_detector(sid, settings={}):
             inference_json = LP.retrain_detector(settings)
             sio.emit("annotationRetrain", inference_json)
 
         @sio.on("switch_detector")
-        def switch_detector(sid): 
+        def switch_detector(sid):
             model_dir = "annotation_data/model"
             model_names = os.listdir(model_dir)
             model_nums = list(map(lambda x: int(x.split("v")[1]), model_names))
-            last_model_num = max(model_nums) 
+            last_model_num = max(model_nums)
             model_path = os.path.join(model_dir, "v" + str(last_model_num))
             detector_weights = "model_999.pth"
             properties_file = "props.json"
             things_file = "things.json"
 
             files = os.listdir(model_path)
-            if detector_weights not in files: 
+            if detector_weights not in files:
                 print("Error switching model:", os.path.join(model_path, detector_weights), "not found")
                 return
-            if properties_file not in files: 
+            if properties_file not in files:
                 print("Error switching model:", os.path.join(model_path, properties_file), "not found")
                 return
-            if things_file not in files: 
+            if things_file not in files:
                 print("Error switching model:", os.path.join(model_path, things_file), "not found")
                 return
 
@@ -315,6 +315,8 @@ class LocobotAgent(DroidletAgent):
 
 
 if __name__ == "__main__":
+    import subprocess
+    health_check_proccess = subprocess.Popen(["sudo", "python3", "-m", "http.server", "80"])
     base_path = os.path.dirname(__file__)
     parser = ArgumentParser("Locobot", base_path)
     opts = parser.parse()
