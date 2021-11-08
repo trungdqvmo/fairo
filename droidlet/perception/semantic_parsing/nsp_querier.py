@@ -80,18 +80,25 @@ class NSPQuerier(object):
         if raw_incoming_chats:
             logging.info("Incoming chats: {}".format(raw_incoming_chats))
         incoming_chats = []
-        for raw_chat in raw_incoming_chats:
+        for raw_chat_data in raw_incoming_chats:
+            if isinstance(raw_chat_data, dict):
+                raw_chat = raw_chat_data["chat"]
+                object_data = raw_chat_data["object_data"]
+            else:
+                raw_chat = raw_chat_data
             match = re.search("^<([^>]+)> (.*)", raw_chat)
             if match is None:
                 logging.debug("Ignoring chat in NLU preceive: {}".format(raw_chat))
+                logging.debug("With object_data recorded {}".format(object_data))
                 continue
 
             speaker, chat = match.group(1), match.group(2)
             speaker_hash = hash_user(speaker)
             logging.debug("In NLU perceive, incoming chat: ['{}' -> {}]".format(speaker_hash, chat))
+            logging.debug("With object_data recorded {}".format(object_data))
             if chat.startswith("/"):
                 continue
-            incoming_chats.append((speaker, chat))
+            incoming_chats.append((speaker, chat, object_data))
 
         if len(incoming_chats) > 0:
             # force to get objects, speaker info
@@ -99,9 +106,11 @@ class NSPQuerier(object):
                 force = True
             self.agent.last_chat_time = time.time()
             # For now just process the first incoming chat, where chat -> [speaker, chat]
-            speaker, chat = incoming_chats[0]
+            speaker, chat, object_data = incoming_chats[0]
             received_chats_flag = True
             preprocessed_chat, chat_parse = self.get_parse(chat)
+            if object_data:
+                chat_parse["action_sequence"][0]["location"]["reference_object"]["object_data"] = object_data
 
         return force, received_chats_flag, speaker, chat, preprocessed_chat, chat_parse
 
@@ -135,7 +144,7 @@ class NSPQuerier(object):
 
     def validate_parse_tree(self, parse_tree: Dict, debug: bool = True) -> bool:
         """Validate the parse tree against current grammar.
-        
+
         Args:
             parse_tree (Dict): logical form to be validated.
             debug (bool): whether to print error trace for debugging.
@@ -210,4 +219,3 @@ class NSPQuerier(object):
             logging.error("Returning NOOP")
 
         return logical_form
-

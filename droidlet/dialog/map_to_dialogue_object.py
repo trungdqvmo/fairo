@@ -68,7 +68,7 @@ class DialogueObjectMapper(object):
             speaker=speaker, logical_form=updated_logical_form, chat=chat, opts=self.opts
         )
 
-    def postprocess_logical_form(self, speaker: str, chat: str, logical_form: Dict, object_data: Dict) -> Dict:
+    def postprocess_logical_form(self, speaker: str, chat: str, logical_form: Dict) -> Dict:
         """This function performs some postprocessing on the logical form:
         substitutes indices with words and resolves coreference"""
         # perform lemmatization on the chat
@@ -100,7 +100,9 @@ class DialogueObjectMapper(object):
 
         # Resolve any co-references like "this", "that" "there" using heuristics
         # and make updates in the dictionary in place.
-        logical_form["action_sequence"][0]["location"]["object_data"] = object_data
+        # update object_data
+        if object_data:
+            logical_form["action_sequence"][0]["location"]["object_data"] = object_data
         coref_resolve(self.dialogue_manager.memory, logical_form, chat)
         logging.info(
             'logical form post co-ref and process_spans "{}" -> {}'.format(

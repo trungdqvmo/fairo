@@ -163,6 +163,9 @@ def coref_resolve(memory, d, chat):
     if not type(d) is dict:
         return
     for k, v in d.items():
+        if k == "object_data":
+            # we passing object_data directly as-if
+            return
         if type(v) == dict:
             coref_resolve(memory, v, chat)
         if type(v) == list:
@@ -199,8 +202,8 @@ def coref_resolve(memory, d, chat):
                         else:
                             v_copy[k_] = mems[0]
             d[k] = v_copy
-        # fix/delete this branch! its for old broken spec
         else:
+            # fix/delete this branch! its for old broken spec
             for k_ in v:
                 if k_ == "contains_coreference":
                     v_copy = deepcopy(v)
@@ -215,3 +218,9 @@ if __name__ == "__main__":
         "{'dialogue_type': 'PUT_MEMORY', 'filters': {'reference_object':{'contains_coreference': 'yes'}}, 'upsert': {'memory_data': {'memory_type': 'TRIPLE', 'has_tag': 'j'}}}"
     )
     y = coref_resolve(None, x, "that is a j")
+    print(x)
+    x = eval(
+        "{'dialogue_type': 'HUMAN_GIVE_COMMAND', 'action_sequence': [{'action_type': 'MOVE', 'location': {'reference_object': {'object_data':{'eid': 1}, 'filters': {'where_clause': {'AND': [{'pred_text': 'has_name', 'obj_text': 'chair'}]}}}}}]}"
+    )
+    y = coref_resolve(None, x, "that is a j")
+    print(x)

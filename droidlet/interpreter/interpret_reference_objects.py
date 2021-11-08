@@ -117,6 +117,7 @@ def interpret_reference_object(
     allow_clarification (bool): should a Clarification object be put on the DialogueStack
     """
     filters_d = d.get("filters")
+    object_data = d.get("object_data")
     special = d.get("special_reference")
     # filters_d can be empty...
     assert (
