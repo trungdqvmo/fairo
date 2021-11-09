@@ -330,7 +330,7 @@ if __name__ == "__main__":
     logging.info("LOG LEVEL: {}".format(logger.level))
 
     # Check that models and datasets are up to date
-    if not opts.dev:
+    if opts.dev:
         rc = subprocess.call([opts.verify_hash_script_path, "locobot"])
 
     set_start_method("spawn", force=True)

@@ -42,13 +42,13 @@ class ArgumentParser:
         )
         self.parser.add_argument(
             "--log_timeline",
-            action="store_true", 
+            action="store_true",
             default=False,
             help="enables timeline logging for dashboard",
         )
         self.parser.add_argument(
             "--enable_timeline",
-            action="store_true", 
+            action="store_true",
             default=False,
             help="enables the dashboard timeline to display events",
         )
@@ -99,7 +99,7 @@ class ArgumentParser:
 
     def add_loco_parser(self):
         loco_parser = self.parser.add_argument_group("Locobot Agent Args")
-        IP = "192.168.1.244"
+        IP = "172.17.0.2"
         if os.getenv("LOCOBOT_IP"):
             IP = os.getenv("LOCOBOT_IP")
             print("setting default locobot ip from env variable LOCOBOT_IP={}".format(IP))
