@@ -298,7 +298,7 @@ def interpret_dance_filter(interpreter, speaker, filters_d, get_all=False):
 
 
 class FilterInterpreter:
-    def __call__(self, interpreter, speaker, filters_d, get_all=False):
+    def __call__(self, interpreter, speaker, filters_d, object_data={}, get_all=False):
         """
         This is a subinterpreter to handle FILTERS dictionaries
 
@@ -307,6 +307,7 @@ class FilterInterpreter:
         speaker (str): The name of the player/human/agent who uttered
             the chat resulting in this interpreter
         filters_d: FILTERS logical form from semantic parser
+        object_data: specify object with datas in object_data # TODO: add filter here
         get_all (bool): if True, output attributes are set with get_all=True
 
         Outputs a (chain) of MemoryFilter objects
