@@ -101,8 +101,8 @@ class DialogueObjectMapper(object):
         # Resolve any co-references like "this", "that" "there" using heuristics
         # and make updates in the dictionary in place.
         # update object_data
-        if object_data:
-            logical_form["action_sequence"][0]["location"]["object_data"] = object_data
+        # if object_data:
+        #     logical_form["action_sequence"][0]["location"]["object_data"] = object_data
         coref_resolve(self.dialogue_manager.memory, logical_form, chat)
         logging.info(
             'logical form post co-ref and process_spans "{}" -> {}'.format(

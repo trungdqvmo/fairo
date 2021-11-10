@@ -86,6 +86,8 @@ class NSPQuerier(object):
                 object_data = raw_chat_data["object_data"]
             else:
                 raw_chat = raw_chat_data
+                object_data = {}
+                logging.warning("Object data is None")
             match = re.search("^<([^>]+)> (.*)", raw_chat)
             if match is None:
                 logging.debug("Ignoring chat in NLU preceive: {}".format(raw_chat))
