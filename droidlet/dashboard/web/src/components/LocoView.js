@@ -49,7 +49,7 @@ class LocoView extends React.Component {
         <LiveObjects
         height={320}
         width={320}
-        offsetH={10 + 320 + 10}
+        offsetH={10}
         offsetW={10}
         stateManager={stateManager}
         />
