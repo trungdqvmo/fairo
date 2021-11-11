@@ -238,6 +238,7 @@ class LiveObjects extends React.Component {
             stroke={highlightColor}
           />,
 		  <Text
+			key={`selected-text-${j}`}
 			text={`Selected Object: ${this.state.selectedObject.id}`}
 			x={5}
 			y={5}
