@@ -112,7 +112,12 @@ class NSPQuerier(object):
             received_chats_flag = True
             preprocessed_chat, chat_parse = self.get_parse(chat)
             if object_data:
-                chat_parse["action_sequence"][0]["location"]["reference_object"]["object_data"] = object_data
+                if "action_sequence" in chat_parse:
+                    chat_parse["action_sequence"][0]["location"]["reference_object"]["object_data"] = object_data
+                elif "action" in chat_parse:
+                    chat_parse["action"][0]["location"]["reference_object"]["object_data"] = object_data
+                else:
+                    pass
 
         return force, received_chats_flag, speaker, chat, preprocessed_chat, chat_parse
 
