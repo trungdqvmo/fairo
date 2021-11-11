@@ -45,6 +45,7 @@ class LiveObjects extends React.Component {
       modelMetrics: null,
       offline: false,
       updateFixup: false,
+      selectedObject: JSON.parse(localStorage.getItem("selected_object")),
     };
     this.state = this.initialState;
   }
@@ -140,6 +141,28 @@ class LiveObjects extends React.Component {
     }
   }
 
+  //handle select object
+  onSelectObject(obj) {
+    const currentObject = JSON.parse(localStorage.getItem("selected_object"));
+    const listObject = this.props.stateManager.memory.db.reference_objects;
+    if (currentObject && currentObject.xyz.toString() === obj.xyz.toString()) {
+      this.setState({ selectedObject: null });
+      localStorage.removeItem("selected_object");
+    } else {
+      listObject.forEach((object) => {
+        const coordinatesObject = [object[2], object[3], object[4]];
+        if (coordinatesObject.toString() === obj.xyz.toString()) {
+          const selectedValues = { id: object[0], xyz: obj.xyz };
+          localStorage.setItem(
+            "selected_object",
+            JSON.stringify(selectedValues)
+          );
+		  this.setState({ selectedObject: selectedValues });
+        }
+      });
+    }
+  }
+
   componentDidMount() {
     if (this.props.stateManager) this.props.stateManager.connect(this);
   }
@@ -189,6 +212,8 @@ class LiveObjects extends React.Component {
       let y2 = parseInt(obj.bbox[3] * scale);
       let h = y2 - y1;
       let w = x2 - x1;
+      const highlightColor = "rgb(237,237,237)";
+
       renderedObjects.push(
         <Rect
           key={j}
@@ -200,6 +225,28 @@ class LiveObjects extends React.Component {
           stroke={color}
         />
       );
+      // when object was selected, highlight it
+      if (this.state.selectedObject && obj.xyz.toString() === this.state.selectedObject.xyz.toString()) {
+        renderedObjects.push(
+          <Rect
+            key={`selected-${j}`}
+            x={x1}
+            y={y1}
+            width={w}
+            height={h}
+            fillEnabled={false}
+            stroke={highlightColor}
+          />,
+		  <Text
+			text={`Selected Object: ${this.state.selectedObject.id}`}
+			x={5}
+			y={5}
+			fill={color}
+			fontSize={12}
+			width={this.state.width - 5}
+		  />
+        );
+      }
       renderedObjects.push(
         <Text
           key={[j++, label]}
@@ -215,6 +262,7 @@ class LiveObjects extends React.Component {
           let mask = obj.mask[j].map((x) => [x[0] * scale, x[1] * scale]);
           renderedObjects.push(
             <Shape
+              onClick={() => this.onSelectObject(obj)}
               sceneFunc={(context, shape) => {
                 context.beginPath();
                 context.moveTo(...mask[0]);

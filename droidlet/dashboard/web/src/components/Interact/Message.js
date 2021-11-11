@@ -116,6 +116,8 @@ class Message extends Component {
   }
 
   handleSubmit() {
+	const selectedObject = JSON.parse(localStorage.getItem('selected_object'));
+	
     //get the message
     var chatmsg = document.getElementById("msg").innerHTML;
     if (chatmsg.replace(/\s/g, "") !== "") {
@@ -124,7 +126,12 @@ class Message extends Component {
       //log message to flask
       this.props.stateManager.logInteractiondata("text command", chatmsg);
       //socket connection
-      this.props.stateManager.socket.emit("sendCommandToAgent", chatmsg);
+      if (selectedObject) {
+		//send selected objectId if it's in localStorage
+		this.props.stateManager.socket.emit("sendCommandToAgent", chatmsg, selectedObject.id);
+	  } else {
+		this.props.stateManager.socket.emit("sendCommandToAgent", chatmsg);
+	  }
       //clear the textbox
       document.getElementById("msg").innerHTML = "";
     }
