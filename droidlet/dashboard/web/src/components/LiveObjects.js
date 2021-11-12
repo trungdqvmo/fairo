@@ -237,14 +237,15 @@ class LiveObjects extends React.Component {
             fillEnabled={false}
             stroke={highlightColor}
           />,
-		  <Text
-			text={`Selected Object: ${this.state.selectedObject.id}`}
-			x={5}
-			y={5}
-			fill={color}
-			fontSize={12}
-			width={this.state.width - 5}
-		  />
+	  <Text
+	    key={`selected-text-${j}`}
+	    text={`Selected Object: ${this.state.selectedObject.id}`}
+	    x={5}
+	    y={5}
+	    fill={color}
+	    fontSize={12}
+	    width={this.state.width - 5}
+	  />
         );
       }
       renderedObjects.push(
