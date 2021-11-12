@@ -1,13 +1,19 @@
 import os
-from .sqlite3worker import Sqlite3Worker
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 # TODO: change dbs to weakref
+# each microservice will excecute a session
 dbs = {}
-def safely_load_db(db_path):
-    db_path = os.path.abspath(db_path)
+def safely_load_db(db_path, ):
+    if db_path != ':memory:':
+        db_path = os.path.abspath(db_path)
     if db_path not in dbs:
         try:
-            dbs[db_path] = Sqlite3Worker(db_path)
+            engine_path = 'sqlite://{}'.format(db_path)
+            Session = sessionmaker(bind=engine)
+            session = Session()
+            #dbs[db_path] = create_engine(engine_path)
         except Exception as e:
             # TODO: change to logging this error
             print(e)
@@ -15,11 +21,14 @@ def safely_load_db(db_path):
             raise e
     return dbs[db_path]
 
-
 class BaseModel(object):
-    def __init__(self, db_path):
+    def __init__(self, db_path=':memory:'):
         self._connector = safely_load_db(db_path)
 
     @property
     def connector(self):
         return self._connector
+
+class session_handler(object):
+    def __init__(self):
+        pass
