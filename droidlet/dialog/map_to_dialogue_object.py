@@ -128,9 +128,9 @@ class DialogueObjectMapper(object):
                 speaker, logical_form, self.low_level_interpreter_data, memory=memory
             )
         elif logical_form["dialogue_type"] == "PUT_MEMORY":
-            return self.dialogue_objects["put_memory"](speaker, logical_form, self.low_level_interpreter_data, memory=memory)
+            return self.dialogue_objects["put_memory"](speaker, logical_form, low_level_data=self.low_level_interpreter_data, memory=memory)
         elif logical_form["dialogue_type"] == "GET_MEMORY":
-            return self.dialogue_objects["get_memory"](speaker, logical_form, self.low_level_interpreter_data, memory=memory)
+            return self.dialogue_objects["get_memory"](speaker, logical_form, low_level_data=self.low_level_interpreter_data, memory=memory)
         else:
             raise ValueError("Bad dialogue_type={}".format(logical_form["dialogue_type"]))
 
