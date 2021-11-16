@@ -1,8 +1,9 @@
 """
 Copyright (c) Facebook, Inc. and its affiliates.
 """
-
+import sys
 import os
+sys.path.insert(0, os.getcwd())
 import subprocess
 import time
 import signal
