@@ -144,30 +144,30 @@ class LocobotAgent(DroidletAgent):
         def log_interaction_data(sid, interactionData):
             self.interaction_logger.logInteraction(interactionData)
 
-        # Returns an array of objects with updated masks
-        @sio.on("label_propagation")
-        def label_propagation(sid, postData):
-            objects = LP.label_propagation(postData)
-            sio.emit("labelPropagationReturn", objects)
-
-        @sio.on("save_rgb_seg")
-        def save_rgb_seg(sid, postData):
-            LP.save_rgb_seg(postData)
-            if "callback" in postData and postData["callback"]:
-                sio.emit("saveRgbSegCallback")
-
-        @sio.on("save_annotations")
-        def save_annotations(sid, categories):
-            LP.save_annotations(categories)
-
-        @sio.on("save_categories_properties")
-        def save_categories_properties(sid, categories, properties):
-            LP.save_categories_properties(categories, properties)
-
-        @sio.on("retrain_detector")
-        def retrain_detector(sid, settings={}):
-            inference_json = LP.retrain_detector(settings)
-            sio.emit("annotationRetrain", inference_json)
+        # # Returns an array of objects with updated masks
+        # @sio.on("label_propagation")
+        # def label_propagation(sid, postData):
+        #     objects = LP.label_propagation(postData)
+        #     sio.emit("labelPropagationReturn", objects)
+        #
+        # @sio.on("save_rgb_seg")
+        # def save_rgb_seg(sid, postData):
+        #     LP.save_rgb_seg(postData)
+        #     if "callback" in postData and postData["callback"]:
+        #         sio.emit("saveRgbSegCallback")
+        #
+        # @sio.on("save_annotations")
+        # def save_annotations(sid, categories):
+        #     LP.save_annotations(categories)
+        #
+        # @sio.on("save_categories_properties")
+        # def save_categories_properties(sid, categories, properties):
+        #     LP.save_categories_properties(categories, properties)
+        #
+        # @sio.on("retrain_detector")
+        # def retrain_detector(sid, settings={}):
+        #     inference_json = LP.retrain_detector(settings)
+        #     sio.emit("annotationRetrain", inference_json)
 
         @sio.on("switch_detector")
         def switch_detector(sid):

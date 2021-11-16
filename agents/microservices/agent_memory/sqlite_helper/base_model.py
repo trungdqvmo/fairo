@@ -1,34 +1,37 @@
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
 # TODO: change dbs to weakref
 # each microservice will excecute a session
 dbs = {}
-def safely_load_db(db_path, ):
-    if db_path != ':memory:':
-        db_path = os.path.abspath(db_path)
-    if db_path not in dbs:
-        try:
-            engine_path = 'sqlite://{}'.format(db_path)
-            Session = sessionmaker(bind=engine)
-            session = Session()
-            #dbs[db_path] = create_engine(engine_path)
-        except Exception as e:
-            # TODO: change to logging this error
-            print(e)
-            # TODO: re raise Exception from exception catched
-            raise e
-    return dbs[db_path]
 
-class BaseModel(object):
+BaseModel = declarative_base()
+meta = MetaData()
+
+class sqlalchemy_session(object):
     def __init__(self, db_path=':memory:'):
-        self._connector = safely_load_db(db_path)
+        # currently only support sqlite db
+        if db_path is not None:
+            engine_path = 'sqlite://{}'.format(db_path)
+            engine = create_engine(engine_path, echo=False)
+            meta.create_all(engine)
+            self.session_initor = sessionmaker(bind=engine)
+        else:
+            self.session_initor = sessionmaker()
 
-    @property
-    def connector(self):
-        return self._connector
+    def __call__( self, name):
+        if name not in dbs:
+            self.session_initor = sessionmaker()
+            dbs[name] = self
+        return dbs[name]
 
-class session_handler(object):
-    def __init__(self):
+    def __enter__(self):
+        return self
+
+    def __exit__( self, exc_type, exc_val, exc_tb ):
+        self.clear()
+
+    def create_all():
         pass
