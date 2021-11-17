@@ -27,7 +27,8 @@ import droidlet.interpreter.robot.tasks as tasks
 def post_process_loc(loc, interpreter):
     self_mem = interpreter.memory.get_mem_by_id(interpreter.memory.self_memid)
     yaw, _ = self_mem.get_yaw_pitch()
-    return (loc[0], loc[2], yaw)
+    # update for matching with current coordinates setting
+    return (-loc[1], loc[0], yaw)
 
 
 def add_default_locs(interpreter):
