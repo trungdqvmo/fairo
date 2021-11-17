@@ -214,9 +214,10 @@ class LoCoBotMover:
             # single xyt position given
             xyt_positions = [xyt_positions]
         for xyt in xyt_positions:
-            logging.info("Move absolute in canonical coordinates {}".format(xyt))
+            #xyt = base_canonical_coords_to_pyrobot_coords(xyt)
+            logging.info("Move absolute in pyrobot coordinates {}".format(xyt))
             self.bot.go_to_absolute(
-                base_canonical_coords_to_pyrobot_coords(xyt),
+                xyt,
                 close_loop=self.close_loop,
                 use_map=use_map,
                 use_dslam=use_dslam,
