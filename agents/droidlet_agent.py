@@ -115,7 +115,7 @@ class DroidletAgent(BaseAgent):
             saveObjectAnnotationsToDb(self.conn, postData)
 
         @sio.on("sendCommandToAgent")
-        def send_text_command_to_agent(sid, command, object_data={}):
+        def send_text_command_to_agent(sid, command, eid=""):
             """Add the command to agent's incoming chats list and
             send back the parse.
             Args:
@@ -123,6 +123,7 @@ class DroidletAgent(BaseAgent):
             Returns:
                 return back a socket emit with parse of command and success status
             """
+            object_data = {"eid": eid}
             logging.info("in send_text_command_to_agent, got the command: %r" % (command))
             logging.info("object_data specialication {}".format(object_data))
 
