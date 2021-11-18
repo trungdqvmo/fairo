@@ -117,7 +117,10 @@ def interpret_reference_object(
     allow_clarification (bool): should a Clarification object be put on the DialogueStack
     """
     filters_d = d.get("filters")
-    object_data = filters_d.get("object_data", {})
+    if filter_d is not None:
+        object_data = filters_d.get("object_data", {})
+    else:
+        object_data = {}
     special = d.get("special_reference")
     # filters_d can be empty...
     assert (
@@ -200,8 +203,14 @@ def apply_memory_filters(interpreter, speaker, filters_d, object_data={}) -> Lis
     """Return a list of (xyz, memory) tuples encompassing all possible reference objects"""
     F = interpreter.subinterpret["filters"](interpreter, speaker, filters_d, object_data=object_data, get_all=True)
     memids, _ = F()
+    if 'eid' in object_data:
+        if memid in memids:
+            memids = [memid]
+        else:
+            memids = []
     # TODO: replace this with real database filter
-    mems = [interpreter.memory.get_mem_by_id(i) for i in memids if 'eid' not in object_data or i == object_data['eid']]
+    mems = [interpreter.memory.get_mem_by_id(memid) for memid in memids]
+
     if len(mems) > 1:
         mems = [mems[0]]
     return mems
