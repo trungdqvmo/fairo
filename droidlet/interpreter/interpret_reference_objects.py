@@ -117,7 +117,7 @@ def interpret_reference_object(
     allow_clarification (bool): should a Clarification object be put on the DialogueStack
     """
     filters_d = d.get("filters")
-    if filter_d is not None:
+    if filters_d is not None:
         object_data = filters_d.get("object_data", {})
     else:
         object_data = {}
@@ -204,8 +204,8 @@ def apply_memory_filters(interpreter, speaker, filters_d, object_data={}) -> Lis
     F = interpreter.subinterpret["filters"](interpreter, speaker, filters_d, object_data=object_data, get_all=True)
     memids, _ = F()
     if 'eid' in object_data:
-        if memid in memids:
-            memids = [memid]
+        if object_data['eid'] in memids:
+            memids = [object_data['eid']]
         else:
             memids = []
     # TODO: replace this with real database filter
