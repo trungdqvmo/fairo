@@ -117,6 +117,7 @@ def interpret_reference_object(
     allow_clarification (bool): should a Clarification object be put on the DialogueStack
     """
     filters_d = d.get("filters")
+    object_data = d.get("object_data", {})
     special = d.get("special_reference")
     # filters_d can be empty...
     assert (
@@ -159,7 +160,7 @@ def interpret_reference_object(
         filters_no_select = deepcopy(filters_d)
         filters_no_select.pop("selector", None)
         #        filters_no_select.pop("location", None)
-        candidate_mems = apply_memory_filters(interpreter, speaker, filters_no_select)
+        candidate_mems = apply_memory_filters(interpreter, speaker, filters_no_select, object_data=object_data)
         if len(candidate_mems) > 0:
             return filter_by_sublocation(
                 interpreter,
@@ -208,11 +209,20 @@ def interpret_reference_object(
             raise ErrorWithResponse("I don't know what you're referring to")
 
 
-def apply_memory_filters(interpreter, speaker, filters_d) -> List[ReferenceObjectNode]:
+def apply_memory_filters(interpreter, speaker, filters_d, object_data={}) -> List[ReferenceObjectNode]:
     """Return a list of (xyz, memory) tuples encompassing all possible reference objects"""
     F = interpreter.subinterpret["filters"](interpreter, speaker, filters_d)
     memids, _ = F()
+    # FIXME: hard fix take object data by uuid without actually query
+    if 'uuid' in object_data:
+        if object_data['uuid'] in memids:
+            memids = [object_data['uuid']]
+        else:
+            memids = []
     mems = [interpreter.memory.get_mem_by_id(i) for i in memids]
+    # FIXME: hard fix take only first object - if still multiple choice of object
+    if len(mems) > 1:
+        mems = [mems[0]]
     return mems
 
 
@@ -279,13 +289,15 @@ def filter_by_sublocation(
                 interpreter.memory, {"frame": eid, "relative_direction": reldir}, mem=self_mem
             )
             c_proj = L(candidates)
-            m_proj = L(mems)
-            # FIXME don't just take the first...
-            m_proj = m_proj[0]
+            m_projs = L(mems)
+            # remove hard fix take the first to allow take object by specify object uuid after that
+            # m_proj = m_proj[0]
 
             # filter by relative dir, e.g. "left of Y"
-            location_filtered_candidates = [c for (p, c) in zip(c_proj, candidates) if p > m_proj]
-            # "the X left of Y" = the right-most X that is left of Y
+            location_filtered_candidates = []
+            for m_proj in m_projs:
+                location_filtered_candidates.extend([c for (p, c) in zip(c_proj, candidates) if p > m_proj])
+                # "the X left of Y" = the right-most X that is left of Y
             location_filtered_candidates.sort(key=lambda p: p.get_pos())
             distance_sorted = True
     else:

@@ -42,7 +42,7 @@ class DroidletAgent(BaseAgent):
         self.perceive_on_chat = False
         self.agent_type = None
         self.scheduler = EmptyScheduler()
-        
+
         self.dashboard_memory_dump_time = time.time()
         self.dashboard_memory = {
             "db": {},
@@ -118,11 +118,12 @@ class DroidletAgent(BaseAgent):
             saveObjectAnnotationsToDb(self.conn, postData)
 
         @sio.on("sendCommandToAgent")
-        def send_text_command_to_agent(sid, command):
+        def send_text_command_to_agent(sid, command, uuid=""):
             """Add the command to agent's incoming chats list and
             send back the parse.
             Args:
                 command: The input text command from dashboard player
+                uuid: The uuid of selected object - if specified
             Returns:
                 return back a socket emit with parse of command and success status
             """
@@ -131,7 +132,14 @@ class DroidletAgent(BaseAgent):
             agent_chat = (
                 "<dashboard> " + command
             )  # the chat is coming from a player called "dashboard"
-            self.dashboard_chat = agent_chat
+            object_data = {}
+            if uuid:
+                object_data["uuid"] = uuid
+            logging.info("in send_text_command_to_agent, got the command: %r" % (command))
+            self.dashboard_chat = {
+                                    "chat" : agent_chat,
+                                    "object_data": object_data
+                                }
             status = "Sent successfully"
             # update server memory
             self.dashboard_memory["chats"].pop(0)
@@ -160,7 +168,7 @@ class DroidletAgent(BaseAgent):
                     logical_form = self.dialogue_manager.dialogue_object_mapper.postprocess_logical_form(speaker="dashboard", chat=chat, logical_form=logical_form)
             except Exception as e:
                 logging.debug(f"Failed to find any action dict for command [{chat}] in memory")
-            
+
             payload = {
                 "action_dict": logical_form
             }

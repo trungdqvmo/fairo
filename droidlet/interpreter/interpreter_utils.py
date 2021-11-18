@@ -163,6 +163,9 @@ def coref_resolve(memory, d, chat):
     if not type(d) is dict:
         return
     for k, v in d.items():
+        if k == "object_data":
+            # we passing through object_data directly as-if
+            return
         if type(v) == dict:
             coref_resolve(memory, v, chat)
         if type(v) == list:
