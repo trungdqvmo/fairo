@@ -116,11 +116,10 @@ def interpret_reference_object(
     extra_tags (list of strings): tags added by parent to narrow the search
     allow_clarification (bool): should a Clarification object be put on the DialogueStack
     """
+    logging.info("got logical form with info {}".format(d))
     filters_d = d.get("filters")
-    if filters_d is not None:
-        object_data = filters_d.get("object_data", {})
-    else:
-        object_data = {}
+    object_data = d.get("object_data", {})
+    logging.info("got object_data with info {}".format(object_data))
     special = d.get("special_reference")
     # filters_d can be empty...
     assert (
@@ -202,6 +201,7 @@ def interpret_reference_object(
 def apply_memory_filters(interpreter, speaker, filters_d, object_data={}) -> List[ReferenceObjectNode]:
     """Return a list of (xyz, memory) tuples encompassing all possible reference objects"""
     F = interpreter.subinterpret["filters"](interpreter, speaker, filters_d, object_data=object_data, get_all=True)
+    logging.info("apply_memory_filters with object_data {}".format(object_data))
     memids, _ = F()
     if 'eid' in object_data:
         if object_data['eid'] in memids:
