@@ -123,7 +123,9 @@ class DroidletAgent(BaseAgent):
             Returns:
                 return back a socket emit with parse of command and success status
             """
-            object_data = {"eid": eid}
+            object_data = {}
+            if eid:
+                object_data = {"eid": eid}
             logging.info("in send_text_command_to_agent, got the command: %r" % (command))
             logging.info("object_data specialication {}".format(object_data))
 
