@@ -36,6 +36,7 @@ class LiveObjects extends React.Component {
     this.onModelSwitch = this.onModelSwitch.bind(this);
     this.onPrevFrame = this.onPrevFrame.bind(this);
     this.onNextFrame = this.onNextFrame.bind(this);
+    this.onSelectObject = this.onSelectObject.bind(this);
 
     this.initialState = {
       height: props.height,
