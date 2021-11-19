@@ -213,9 +213,11 @@ class LiveObjects extends React.Component {
       if (obj && obj.mask) {
         for (let j = 0; j < obj.mask.length; j++) {
           let mask = obj.mask[j].map((x) => [x[0] * scale, x[1] * scale]);
-          renderedObjects.push(
-            <Shape
-              sceneFunc={(context, shape) => {
+          if(obj.label !== 'person') {
+            renderedObjects.push(
+              <Shape
+                onClick={() => this.onSelectObject(obj)} //handle click object's mask
+                sceneFunc={(context, shape) => {
                 context.beginPath();
                 context.moveTo(...mask[0]);
                 for (let k = 1; k < mask.length; k++) {
@@ -223,14 +225,15 @@ class LiveObjects extends React.Component {
                 }
                 context.closePath();
                 context.fillStrokeShape(shape);
-              }}
-              fill={color}
-              opacity={0.5}
-              stroke={obj.type === "detector" ? "white" : "black"}
-              strokeWidth={1}
-              key={`${i}-${j}`}
-            />
-          );
+                }}
+                fill={color}
+                opacity={0.5}
+                stroke={obj.type === "detector" ? "white" : "black"}
+                strokeWidth={1}
+                key={`${i}-${j}`}
+              />
+            );
+          }
         }
       }
     });
