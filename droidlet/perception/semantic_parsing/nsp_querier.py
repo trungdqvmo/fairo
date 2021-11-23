@@ -116,7 +116,7 @@ class NSPQuerier(object):
                         chat_parse["action_sequence"][0]["location"]["reference_object"]["object_data"] = object_data
                 elif "action" in chat_parse:
                     if chat_parse["action_sequence"][0].get("location", {}).get("reference_object", {}):
-                    chat_parse["action"][0]["location"]["reference_object"]["object_data"] = object_data
+                        chat_parse["action"][0]["location"]["reference_object"]["object_data"] = object_data
                 else:
                     # not handle this case
                     pass
