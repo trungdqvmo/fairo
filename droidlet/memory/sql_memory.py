@@ -955,12 +955,14 @@ et        """
             >>> query = "SELECT uuid FROM Memories WHERE node_type=?"
             >>> _db_read(query, 'Chat')
         """
+        logging.debug(f"Read all with query: {query}")
         args = tuple(a.item() if isinstance(a, np.number) else a for a in args)
         try:
             c = self.db.cursor()
             c.execute(query, args)
             r = c.fetchall()
             c.close()
+            logging.debug(f"Got result: {r}")
             return r
         except:
             logging.error("Bad read: {} : {}".format(query, args))
@@ -981,12 +983,14 @@ et        """
             >>> args = 'Chat'
             >>> _db_read_one(query, args)
         """
+        logging.debug(f"Read one with query: {query}")
         args = tuple(a.item() if isinstance(a, np.number) else a for a in args)
         try:
             c = self.db.cursor()
             c.execute(query, args)
             r = c.fetchone()
             c.close()
+            logging.debug(f"Got result: {r}")
             return r
         except:
             logging.error("Bad read: {} : {}".format(query, args))
@@ -1042,6 +1046,7 @@ et        """
         return r
 
     def _db_write(self, query: str, *args) -> int:
+        logging.debug(f"Write with query {query}")
         args = tuple(a.item() if isinstance(a, np.number) else a for a in args)
         try:
             c = self.db.cursor()
