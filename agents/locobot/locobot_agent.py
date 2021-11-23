@@ -115,15 +115,15 @@ class LocobotAgent(DroidletAgent):
                     movement[0] -= movement_values["velocity"]
                     print("action: BACKWARD")
                 elif command == "MOVE_LEFT":
-                    movement[2] += movement_values["yaw"]
+                    movement[1] += movement_values["velocity"]
                     print("action: LEFT")
                 elif command == "MOVE_RIGHT":
-                    movement[2] -= movement_values["yaw"]
+                    movement[1] -= movement_values["velocity"]
                     print("action: RIGHT")
                 elif command == "PAN_LEFT":
-                    self.mover.bot.set_pan(self.mover.bot.get_pan() + 0.08)
+                    movement[2] += movement_values["yaw"]
                 elif command == "PAN_RIGHT":
-                    self.mover.bot.set_pan(self.mover.bot.get_pan() - 0.08)
+                    movement[2] -= movement_values["yaw"]
                 elif command == "TILT_UP":
                     self.mover.bot.set_tilt(self.mover.bot.get_tilt() - 0.08)
                 elif command == "TILT_DOWN":
