@@ -2,6 +2,7 @@
 Copyright (c) Facebook, Inc. and its affiliates.
 """
 
+import logging
 import math
 from droidlet.shared_data_structs import ErrorWithResponse
 from .interpreter_utils import SPEAKERLOOK, backoff_where
