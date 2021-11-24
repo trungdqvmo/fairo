@@ -63,7 +63,7 @@ class SLAM(object):
         return self.real2map(robot_loc)
 
     def map2robot(self, map_loc):
-        # return self.map2real(map_loc)
+        return self.map2real(map_loc)
         # TODO: re-enable and test this code when init_state can be non-zero
         # real_loc = self.map2real(map_loc)
         # loc = du.get_relative_state(real_loc, (0.0, 0.0, -self.init_state[2]))
