@@ -222,7 +222,7 @@ class LoCoBotMover:
             start_base_state = self.get_base_pos_in_canonical_coords()
             self.nav_result.wait() # wait for the previous navigation command to finish
             self.nav_result = self.nav.go_to_absolute(
-                tuple(xyt), #base_canonical_coords_to_pyrobot_coords(xyt),
+                tuple(xyt) #base_canonical_coords_to_pyrobot_coords(xyt),
             )
             if blocking:
                 self.nav_result.wait()
