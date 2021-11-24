@@ -51,7 +51,7 @@ class SLAM(object):
 
     def real2map(self, real):
         return self.map_builder.real2map(real)
-    
+
     def map2real(self, map_loc):
         return self.map_builder.map2real(map_loc)
 
@@ -63,16 +63,16 @@ class SLAM(object):
         return self.real2map(robot_loc)
 
     def map2robot(self, map_loc):
-        return self.map2real(map_loc)
+        # return self.map2real(map_loc)
         # TODO: re-enable and test this code when init_state can be non-zero
-        # real_loc = self.map2real(map_loc)
-        # loc = du.get_relative_state(real_loc, (0.0, 0.0, -self.init_state[2]))
+        real_loc = self.map2real(map_loc)
+        loc = du.get_relative_state(real_loc, (0.0, 0.0, -self.init_state[2]))
 
-        # # 2) add the offset
-        # loc = list(loc)
-        # loc[0] += self.init_state[0]
-        # loc[1] += self.init_state[1]
-        # return tuple(loc)
+        # 2) add the offset
+        loc = list(loc)
+        loc[0] += self.init_state[0]
+        loc[1] += self.init_state[1]
+        return tuple(loc)
 
     def add_obstacle(self, location, in_map=False):
         """
@@ -89,7 +89,7 @@ class SLAM(object):
             self.robot.get_base_state(),
             self.init_state)
         pcd = self.robot.get_current_pcd(in_cam=False)[0]
-        
+
         self.map_builder.update_map(pcd, robot_relative_pos)
 
         # explore the map by robot shape
@@ -117,7 +117,7 @@ robot_ip = os.getenv('LOCOBOT_IP')
 ip = os.getenv('LOCAL_IP')
 with Pyro4.Daemon(ip) as daemon:
     robot = Pyro4.Proxy("PYRONAME:remotelocobot@" + robot_ip)
-    obj = SLAM(robot)    
+    obj = SLAM(robot)
     obj_uri = daemon.register(obj)
     with Pyro4.locateNS(robot_ip) as ns:
         ns.register("slam", obj_uri)
@@ -144,4 +144,3 @@ with Pyro4.Daemon(ip) as daemon:
     #         daemon.events(events)
     # except KeyboardInterrupt:
     #     pass
-
