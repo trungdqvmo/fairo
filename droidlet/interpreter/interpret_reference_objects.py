@@ -346,9 +346,12 @@ def object_looked_at(
 
     Returns: a list of (xyz, mem) tuples, max length `limit`
     """
+    logging.error(f"got eid {eid} and speaker {speaker}")
     if len(candidates) == 0:
         return []
-    assert eid or speaker
+    #assert eid or speaker
+    if not eid and speaker:
+        eid = 0
     if not eid:
         eid = memory.get_player_by_name(speaker).eid
     # TODO wrap in try/catch, handle failures in finding speaker or not having speakers LOS

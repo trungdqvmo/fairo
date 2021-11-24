@@ -62,7 +62,7 @@ class ReferenceLocationInterpreter:
 
         default_loc = getattr(interpreter, "default_loc", SPEAKERLOOK)
         ref_obj = d.get("reference_object", default_loc["reference_object"])
-        logging.debug(f"Tracing speaker {speaker} for debug moving session")
+        logging.error(f"Tracing speaker {speaker} for debug moving session")
         mems = interpreter.subinterpret["reference_objects"](
             interpreter, speaker, ref_obj, loose_speakerlook=loose_speakerlook
         )

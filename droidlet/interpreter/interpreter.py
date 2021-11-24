@@ -192,7 +192,7 @@ class Interpreter(InterpreterBase):
             agent.memory.get_mem_by_id(u.memid).get_update_status({"paused": 1})
         undo_command = old_task.get_chat().chat_text
 
-        logging.debug("Pushing ConfirmTask tasks={}".format(undo_tasks))
+        logging.error("Pushing ConfirmTask tasks={}".format(undo_tasks))
         confirm_data = {
             "task_memids": [u.memid for u in undo_tasks],
             "question": 'Do you want me to undo the command: "{}" ?'.format(undo_command),
@@ -202,7 +202,7 @@ class Interpreter(InterpreterBase):
         return None, None
 
     def handle_move(self, agent, speaker, d) -> Tuple[Optional[str], Any]:
-        logging.debug(f"Tracing speaker {speaker} for debug moving session")
+        logging.error(f"Tracing speaker {speaker} for debug moving session")
         Move = self.task_objects["move"]
         Control = self.task_objects["control"]
 
@@ -222,11 +222,11 @@ class Interpreter(InterpreterBase):
             if loop_mem:
                 mems = [loop_mem]
             else:
-                logging.debug(f"Tracing speaker {speaker} for debug moving session")
+                logging.error(f"Tracing speaker {speaker} for debug moving session")
                 mems = self.subinterpret["reference_locations"](self, speaker, location_d)
             # FIXME this should go in the ref_location subinterpret:
             steps, reldir = interpret_relative_direction(self, location_d)
-            logging.debug(f"Load steps {steps} and reldir {reldir} for debug moving session")
+            logging.error(f"Load steps {steps} and reldir {reldir} for debug moving session")
             pos, _ = self.subinterpret["specify_locations"](self, speaker, mems, steps, reldir)
             # TODO: can this actually happen?
             if pos is None:
