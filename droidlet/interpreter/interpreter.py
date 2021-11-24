@@ -61,7 +61,7 @@ class InterpreterBase:
 class Interpreter(InterpreterBase):
     """
     | This class takes a logical form from the semantic parser that specifies a
-    | (world affecting) action for the agent 
+    | (world affecting) action for the agent
     | and the world state (from the agent's memory),
     | and uses these to intialize tasks to run
     | Most of the logic of the interpreter is run in the subinterpreters and task handlers.
@@ -202,6 +202,7 @@ class Interpreter(InterpreterBase):
         return None, None
 
     def handle_move(self, agent, speaker, d) -> Tuple[Optional[str], Any]:
+        logging.debug(f"Tracing speaker {speaker} for debug moving session")
         Move = self.task_objects["move"]
         Control = self.task_objects["control"]
 
@@ -221,9 +222,11 @@ class Interpreter(InterpreterBase):
             if loop_mem:
                 mems = [loop_mem]
             else:
+                logging.debug(f"Tracing speaker {speaker} for debug moving session")
                 mems = self.subinterpret["reference_locations"](self, speaker, location_d)
             # FIXME this should go in the ref_location subinterpret:
             steps, reldir = interpret_relative_direction(self, location_d)
+            logging.debug(f"Load steps {steps} and reldir {reldir} for debug moving session")
             pos, _ = self.subinterpret["specify_locations"](self, speaker, mems, steps, reldir)
             # TODO: can this actually happen?
             if pos is None:

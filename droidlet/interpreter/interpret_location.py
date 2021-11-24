@@ -61,6 +61,7 @@ class ReferenceLocationInterpreter:
 
         default_loc = getattr(interpreter, "default_loc", SPEAKERLOOK)
         ref_obj = d.get("reference_object", default_loc["reference_object"])
+        logging.debug(f"Tracing speaker {speaker} for debug moving session")
         mems = interpreter.subinterpret["reference_objects"](
             interpreter, speaker, ref_obj, loose_speakerlook=loose_speakerlook
         )
@@ -80,8 +81,9 @@ class ReferenceLocationInterpreter:
         if len(mems) < expected_num:
             raise ErrorWithResponse("I don't know what you're referring to")
 
-        # remove hard fix as it should be take care if len(mems) > expected_num
-        # mems = mems[:expected_num]
+        if len(mems) > expected_num:
+            logging.warning(f"Too many satisfied member ({len(mems)}) caught in sight. Temporary fixing by select first {expected_num} mems")
+            mems = mems[:expected_num]
         interpreter.memory.update_recent_entities(mems)
 
         return mems
