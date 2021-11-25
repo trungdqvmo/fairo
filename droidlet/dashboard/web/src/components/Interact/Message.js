@@ -131,7 +131,7 @@ class Message extends Component {
         this.props.stateManager.socket.emit(
           "sendCommandToAgent",
           chatmsg,
-          selectedObject.uuid
+          {'uuid': selectedObject.uuid}
         );
       } else {
         this.props.stateManager.socket.emit("sendCommandToAgent", chatmsg);
