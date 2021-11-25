@@ -66,7 +66,6 @@ class ObjectDeduplicator(AbstractHandler):
         current_object.feature_repr = self.get_feature_repr(current_object.get_masked_img())
         cos = torch.nn.CosineSimilarity(dim=1)
         is_novel = True
-        matched_object = None
 
         # Future = use all object features to calculate novelty
         for previous_object in previous_objects:
@@ -91,11 +90,16 @@ class ObjectDeduplicator(AbstractHandler):
                 # FIXME pick best match?
                 if self.is_match(score.item(), dist):
                     is_novel = False
-                    matched_object = previous_object
                     current_object.eid = previous_object.eid
+                    current_object.xyz = previous_object.xyz
+                    try:
+                        current_object.center = previous_object.center
+                    except:
+                        logging.warning("previous_object dont have center value")
+                        pass
                     break
         logging.info("world object {}, is_novel {}".format(current_object.label, is_novel))
-        return is_novel, matched_object
+        return is_novel
 
     def __call__(self, current_objects, previous_objects):
         """run the deduplication for the current objects detected.
@@ -111,10 +115,10 @@ class ObjectDeduplicator(AbstractHandler):
         new_objects = []
         updated_objects = []
         for current_object in current_objects:
-            is_novel, matched_object = self.is_novel(current_object, previous_objects)
+            is_novel = self.is_novel(current_object, previous_objects)
             if is_novel:
                 # FIXME: try to novelty with current new object, as current ObjectDetection seem like can't do it itself
-                is_novel, matched_object = self.is_novel(current_object, new_objects)
+                is_novel = self.is_novel(current_object, new_objects)
                 if not is_novel:
                     logging.info(
                         f"Duplicate Current Instance ({current_object.label}) {current_object.eid} is at location: "
@@ -141,8 +145,6 @@ class ObjectDeduplicator(AbstractHandler):
                     if u.eid == current_object.eid:
                         exists = True
                 if exists == False:
-                    #updated_objects.append(current_object)
-                    # FIXME: this should be current_object, but seem like it cannot work well enough
-                    updated_objects.append(matched_object)
+                    updated_objects.append(current_object)
 
         return new_objects, updated_objects
