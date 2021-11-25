@@ -118,12 +118,12 @@ class DroidletAgent(BaseAgent):
             saveObjectAnnotationsToDb(self.conn, postData)
 
         @sio.on("sendCommandToAgent")
-        def send_text_command_to_agent(sid, command, uuid=""):
+        def send_text_command_to_agent(sid, command, object_data={}):
             """Add the command to agent's incoming chats list and
             send back the parse.
             Args:
                 command: The input text command from dashboard player
-                uuid: The uuid of selected object - if specified
+                object_data: The trait of selected object - if specified
             Returns:
                 return back a socket emit with parse of command and success status
             """
@@ -132,10 +132,7 @@ class DroidletAgent(BaseAgent):
             agent_chat = (
                 "<dashboard> " + command
             )  # the chat is coming from a player called "dashboard"
-            object_data = {}
-            if uuid:
-                object_data["uuid"] = uuid
-            logging.info("in send_text_command_to_agent, got the command: %r" % (command))
+            logging.debug("in send_text_command_to_agent, got the trait: %r" % (object_data))
             self.dashboard_chat = {
                                     "chat" : agent_chat,
                                     "object_data": object_data
