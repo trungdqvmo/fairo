@@ -55,6 +55,7 @@ class Navigation(object):
         self.robot = robot
         self.trackback = Trackback(planner)
         self._busy = False
+        self._interrupted = False
 
     def go_to_relative(self, goal):
         robot_loc = self.robot.get_base_state()
@@ -64,7 +65,7 @@ class Navigation(object):
         abs_goal[1] += robot_loc[1]
         abs_goal[2] = goal[2] + robot_loc[2]
         return self.go_to_absolute(abs_goal)
-    
+
     def go_to_absolute(self, goal, steps=100000000):
         self._busy = True
         robot_loc = self.robot.get_base_state()
@@ -72,6 +73,11 @@ class Navigation(object):
         goal_reached = False
         return_code = True
         while (not goal_reached) and steps > 0:
+            if self._interrupted:
+                # got interrupted command
+                self._interrupted = False
+                return_code = False
+                break
             stg = self.planner.get_short_term_goal(robot_loc, goal)
             if stg == False:
                 # no path to end-goal
@@ -113,13 +119,19 @@ class Navigation(object):
         self._busy = False
         return return_code
 
+    @Pyro4.oneway
+    def stop(self):
+        """stops robot base movement."""
+        self._busy = False
+        self.robot.stop()
+
     def explore(self):
         if not hasattr(self, '_done_exploring'):
             self._done_exploring = False
         if not self._done_exploring:
             print("exploring 1 step")
             far_away_goal = (19, 19, 0)
-            success = self.go_to_absolute(far_away_goal, steps=1)       
+            success = self.go_to_absolute(far_away_goal, steps=1)
             if success == False:
                 # couldn't reach far_away_goal
                 # and don't seem to have any unexplored
@@ -145,6 +157,3 @@ with Pyro4.Daemon(ip) as daemon:
 
     print("Navigation Server is started...")
     daemon.requestLoop()
-
-
-
