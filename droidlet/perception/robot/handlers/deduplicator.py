@@ -99,7 +99,7 @@ class ObjectDeduplicator(AbstractHandler):
                         pass
                     break
         logging.info("world object {}, is_novel {}".format(current_object.label, is_novel))
-        return is_novel
+        return is_novel, current_object
 
     def __call__(self, current_objects, previous_objects):
         """run the deduplication for the current objects detected.
@@ -115,15 +115,15 @@ class ObjectDeduplicator(AbstractHandler):
         new_objects = []
         updated_objects = []
         for current_object in current_objects:
-            is_novel = self.is_novel(current_object, previous_objects)
+            is_novel, modified_current_object = self.is_novel(current_object, previous_objects)
             if is_novel:
                 # FIXME: try to novelty with current new object, as current ObjectDetection seem like can't do it itself
-                is_novel = self.is_novel(current_object, new_objects)
+                is_novel, modified_current_object = self.is_novel(current_object, new_objects)
                 if not is_novel:
                     logging.info(
-                        f"Duplicate Current Instance ({current_object.label}) {current_object.eid} is at location: "
-                        f"({np.around(np.array(current_object.xyz), 11)}),"
-                        f" Center:({current_object.center})"
+                        f"Duplicate Current Instance ({modified_current_object.label}) {modified_current_object.eid} is at location: "
+                        f"({np.around(np.array(modified_current_object.xyz), 11)}),"
+                        f" Center:({modified_current_object.center})"
                     )
                     continue
                 current_object.eid = self.object_id_counter
@@ -136,15 +136,15 @@ class ObjectDeduplicator(AbstractHandler):
                 )
             else:
                 logging.info(
-                    f"Old Instance ({current_object.label}) {current_object.eid} is at location: "
-                    f"({np.around(np.array(current_object.xyz), 11)}),"
-                    f" Center:({current_object.center})"
+                    f"Old Instance ({modified_current_object.label}) {modified_current_object.eid} is at location: "
+                    f"({np.around(np.array(modified_current_object.xyz), 11)}),"
+                    f" Center:({modified_current_object.center})"
                 )
                 exists = False
                 for u in updated_objects:
-                    if u.eid == current_object.eid:
+                    if u.eid == modified_current_object.eid:
                         exists = True
                 if exists == False:
-                    updated_objects.append(current_object)
+                    updated_objects.append(modified_current_object)
 
         return new_objects, updated_objects
