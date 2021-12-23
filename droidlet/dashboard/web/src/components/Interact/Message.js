@@ -75,6 +75,7 @@ class Message extends Component {
   }
 
   handleSubmit() {
+    const selectedObject = JSON.parse(localStorage.getItem("selected_object"));
     //get the message
     var chatmsg = document.getElementById("msg").value;
     if (chatmsg.replace(/\s/g, "") !== "") {
@@ -90,7 +91,16 @@ class Message extends Component {
       //send message to TurkInfo
       this.props.stateManager.sendCommandToTurkInfo(chatmsg);
       //socket connection
-      this.props.stateManager.socket.emit("sendCommandToAgent", chatmsg);
+      if (selectedObject) {
+        //send selected objectId if it exists in localStorage
+        this.props.stateManager.socket.emit(
+          "sendCommandToAgent",
+          chatmsg,
+          selectedObject.uuid
+        );
+      } else {
+        this.props.stateManager.socket.emit("sendCommandToAgent", chatmsg);
+      }
       //update StateManager command state
       this.props.stateManager.memory.commandState = "sent";
       //clear the textbox
