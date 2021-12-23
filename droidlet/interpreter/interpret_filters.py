@@ -74,8 +74,8 @@ def maybe_handle_specific_mem(interpreter, speaker, filters_d, val_map):
 def interpret_where_clause(
     interpreter, speaker, where_d, memory_type="ReferenceObject", ignore_self=False
 ):
-    """ 
-    where_d is a sentence (nested dict/list) of the recursive form 
+    """
+    where_d is a sentence (nested dict/list) of the recursive form
     COMPARATOR, TRIPLE, or {CONJUNCTION, [where_clauses]}
     where each CONJUCTION is either "AND", "OR", or "NOT"
     """
@@ -295,7 +295,7 @@ def interpret_dance_filter(interpreter, speaker, filters_d, get_all=False):
 
 
 class FilterInterpreter:
-    def __call__(self, interpreter, speaker, filters_d, get_all=False):
+    def __call__(self, interpreter, speaker, filters_d, object_data={}, get_all=False):
         """
         This is a subinterpreter to handle FILTERS dictionaries
 
@@ -304,6 +304,7 @@ class FilterInterpreter:
         speaker (str): The name of the player/human/agent who uttered
             the chat resulting in this interpreter
         filters_d: FILTERS logical form from semantic parser
+        object_data: information of selected object - if specified # FIXME: should put into query here
         get_all (bool): if True, output attributes are set with get_all=True
 
         Outputs a (chain) of MemoryFilter objects

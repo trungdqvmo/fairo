@@ -80,8 +80,8 @@ class ReferenceLocationInterpreter:
         if len(mems) < expected_num:
             raise ErrorWithResponse("I don't know what you're referring to")
 
-        # FIXME:
-        mems = mems[:expected_num]
+        # remove hard fix as it should be take care if len(mems) > expected_num
+        # mems = mems[:expected_num]
         interpreter.memory.update_recent_entities(mems)
 
         return mems
