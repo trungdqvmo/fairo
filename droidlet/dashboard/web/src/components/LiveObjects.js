@@ -8,6 +8,7 @@ import React from "react";
 import { Rnd } from "react-rnd";
 import { Stage, Layer, Image as KImage, Rect, Text, Shape } from "react-konva";
 import ObjectFixup from "./ObjectFixup";
+import MemoryList from "./MemoryList";
 
 const COLORS = [
   "rgba(0,200,0,.5)",
@@ -46,6 +47,7 @@ class LiveObjects extends React.Component {
       modelMetrics: null,
       offline: false,
       updateFixup: false,
+      selectedObject: JSON.parse(localStorage.getItem("selected_object")),
     };
     this.state = this.initialState;
   }
@@ -144,6 +146,33 @@ class LiveObjects extends React.Component {
     }
   }
 
+  onSelectObject(obj) {
+    const currentObject = JSON.parse(localStorage.getItem("selected_object"));
+    let stateManager = this.props.stateManager;
+    let listObject = [];
+    //get list object from MemoryList
+    stateManager.refs.forEach((ref) => {
+	  if (ref instanceof MemoryList) {
+	    listObject = ref.state.memory.reference_objects;
+	  }
+	});
+	 
+	//change objectId in localStorage when click object
+    if (currentObject && currentObject.id.toString() === obj.id.toString()) {
+      this.setState({ selectedObject: null });
+      localStorage.removeItem("selected_object");
+    } else {
+      listObject.forEach((object) => {
+        const objectId = object[1]; //hardcoded by response data, not sure if data change in future
+        if (objectId && objectId.toString() === obj.id.toString()) {
+          const selectedValues = { uuid: object[0], id: obj.id };
+          localStorage.setItem("selected_object", JSON.stringify(selectedValues));
+          this.setState({ selectedObject: selectedValues });
+        }
+      });
+    }
+  }
+
   componentDidMount() {
     if (this.props.stateManager) this.props.stateManager.connect(this);
   }
@@ -200,6 +229,7 @@ class LiveObjects extends React.Component {
       let y2 = parseInt(obj.bbox[3] * scale);
       let h = y2 - y1;
       let w = x2 - x1;
+      const highlightColor = "rgb(237,237,237)";
       renderedObjects.push(
         <Rect
           key={j}
@@ -212,11 +242,35 @@ class LiveObjects extends React.Component {
           opacity={1.0}
         />
       );
+      // when object was selected, highlight it
+      if (this.state.selectedObject && obj.id.toString() === this.state.selectedObject.id.toString()) {
+        renderedObjects.push(
+          <Rect
+            key={`selected-${j}`}
+            x={x1}
+            y={y1}
+            width={w}
+            height={h}
+            fillEnabled={false}
+            stroke={highlightColor}
+          />,
+          <Text
+	        key={`selected-text-${j}`}
+	        text={`Selected Object: ${this.state.selectedObject.uuid}`}
+	        x={5}
+	        y={5}
+	        fill={color}
+	        fontSize={12}
+	        width={this.state.width - 5}
+	      />
+	    );
+	  }
       if (obj && obj.mask) {
         for (let j = 0; j < obj.mask.length; j++) {
           let mask = obj.mask[j].map((x) => [x[0] * scale, x[1] * scale]);
           renderedObjects.push(
             <Shape
+              onClick={() => this.onSelectObject(obj)} //handle click object's mask
               sceneFunc={(context, shape) => {
                 context.beginPath();
                 context.moveTo(...mask[0]);
